@@ -4,6 +4,7 @@ use Mojo::SlackRTM;
 my $token	= $ENV{SLACK_TOKEN}	// die "Please set the SLACK_TOKEN variable";
 my $reaction	= $ENV{SLACK_REACTION}	// "100";
 my $user	= $ENV{SLACK_USER};
+my $lookfor	= $ENV{SLACK_LOOKFOR};
 
 my $slack = Mojo::SlackRTM->new(token => $token);
 $slack->on(message => sub {
@@ -12,7 +13,8 @@ $slack->on(message => sub {
 	my $user_id	= $event->{user};
 	my $user_name	= $slack->find_user_name($user_id);
 	my $ts		= $event->{ts};
-	if(not defined $user or lc $user_name eq lc $user) {
+	my $text	= $event->{text};
+	if(not defined $user or lc $user_name eq lc $user or $text =~ /\b$user\b/i or (defined $lookfor and $text =~ /\b$lookfor\b/i)) {
 		$slack->call_api("reactions.add", {
 			name		=> $reaction	,
 			channel		=> $channel_id	,
