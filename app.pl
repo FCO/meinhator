@@ -14,7 +14,21 @@ $slack->on(message => sub {
 	my $user_name	= $slack->find_user_name($user_id);
 	my $ts		= $event->{ts};
 	my $text	= $event->{text};
-	if(not defined $user or lc $user_name eq lc $user or $text =~ /\b$user\b/i or (defined $lookfor and $text =~ /\b$lookfor\b/i)) {
+	my @citated;
+	for my $cuser($text =~ /<@(.+?)(?:\|.+?)?>/g) {
+		push @citated, $slack->find_user_name($cuser);
+	}
+	$slack->log->debug("Citated: " . join ", ", @citated) if @citated;
+	if(
+		not defined $user
+		or lc $user_name eq lc $user
+		or grep {lc $_ eq lc $user} @citated
+		or $text =~ /\b$user\b/i
+		or (
+			defined $lookfor
+			and $text =~ /\b$lookfor\b/i
+		)
+	) {
 		$slack->call_api("reactions.add", {
 			name		=> $reaction	,
 			channel		=> $channel_id	,
