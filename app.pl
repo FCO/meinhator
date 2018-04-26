@@ -4,6 +4,7 @@ use Mojo::SlackRTM;
 my $token	= $ENV{SLACK_TOKEN}	// die "Please set the SLACK_TOKEN variable";
 my $reaction	= $ENV{SLACK_REACTION}	// "100";
 my $user	= $ENV{SLACK_USER};
+my $uid		= $ENV{SLACK_USER_ID};
 my $lookfor	= $ENV{SLACK_LOOKFOR};
 
 my $slack = Mojo::SlackRTM->new(token => $token);
@@ -21,6 +22,7 @@ $slack->on(message => sub {
 	$slack->log->debug("Citated: " . join ", ", @citated) if @citated;
 	if(
 		not defined $user
+        or lc $uid eq lc $user_id
 		or lc $user_name eq lc $user
 		or grep {lc $_ eq lc $user} @citated
 		or $text =~ /\b$user\b/i
