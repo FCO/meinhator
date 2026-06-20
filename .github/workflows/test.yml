@@ -1,0 +1,33 @@
+name: test
+
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+jobs:
+  perl:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+        perl-version:
+          - 'latest'
+          - '5.40'
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl-version }}
+      - name: Install Dependencies
+        run: |
+          cpanm --installdeps --notest .
+      - name: Check Syntax
+        run: |
+          perl -c app.pl

@@ -1,5 +1,5 @@
-FROM        perl:latest
-MAINTAINER  Fernando Correa de Oliveira <fco@cpan.org>
+FROM perl:latest
+LABEL maintainer="Fernando Correa de Oliveira <fco@cpan.org>"
 
 RUN curl -L http://cpanmin.us | perl - App::cpanminus
 RUN cpanm Carton
